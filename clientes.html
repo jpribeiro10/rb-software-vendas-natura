@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes - Sistema de Vendas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- LOGO NO TOPO DO SISTEMA -->
+    <div style="margin-top: 20px; margin-bottom: -10px;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 80" width="200">
+            <defs>
+                <linearGradient id="rbGradTopo" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#3498db; stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#2c3e50; stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            <rect x="10" y="15" width="50" height="50" rx="12" fill="url(#rbGradTopo)" />
+            <path d="M 25 25 L 25 55 M 25 25 C 40 25 40 40 25 40 C 40 40 40 55 25 55 M 25 40 L 35 55" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="75" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="800" fill="#2c3e50">RB Softwares</text>
+            <text x="77" y="60" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#7f8c8d" letter-spacing="4">COMERCIAIS</text>
+        </svg>
+    </div>
+    <!-- Menu de Navegação Global -->
+    <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+        <button onclick="window.location.href='index.html'">🛒 Frente de Caixa</button>
+        <!-- Adicionamos IDs nestes dois botões -->
+        <button id="menuEstoque" onclick="window.location.href='estoque.html'">📦 Estoque</button>
+        <button id="menuClientes" onclick="window.location.href='clientes.html'">👤 Clientes</button>
+        <button id="menuFinanceiro" onclick="window.location.href='financeiro.html'">💰 Financeiro</button>
+        
+        <button onclick="fazerLogout()" style="background-color: #e74c3c; margin-left: auto;">🚪 Sair</button>
+    </div>
+
+    <h1>Gestão de Clientes</h1>
+
+    <div id="clientes">
+        <h2>1. Cadastrar / Editar Cliente</h2>
+        <input type="text" id="nomeCliente" placeholder="Nome Completo">
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+            <input type="text" id="cpfCliente" placeholder="CPF (Apenas números)" oninput="mascaraCPF(this)" maxlength="14" style="flex: 1; margin-bottom: 0;">
+            <input type="text" id="telefoneCliente" placeholder="Telefone / WhatsApp" oninput="mascaraTelefone(this)" maxlength="15" style="flex: 1; margin-bottom: 0;">
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+            <input type="text" id="cepCliente" placeholder="CEP" oninput="mascaraCEP(this)" maxlength="9" style="flex: 1; min-width: 100px; margin-bottom: 0;">
+            <input type="text" id="ruaCliente" placeholder="Rua / Avenida" style="flex: 3; min-width: 200px; margin-bottom: 0;">
+            <input type="text" id="numeroCliente" placeholder="Número" style="flex: 1; min-width: 80px; margin-bottom: 0;">
+        </div>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+            <input type="text" id="bairroCliente" placeholder="Bairro" style="flex: 1; margin-bottom: 0;">
+            <input type="text" id="cidadeCliente" placeholder="Cidade" style="flex: 1; margin-bottom: 0;">
+        </div>
+
+        <!-- NOVO CAMPO: UPLOAD DE DOCUMENTO -->
+        <div style="margin-bottom: 15px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; border: 1px dashed #3498db;">
+            <label style="font-weight: bold; font-size: 0.9em; display: block; margin-bottom: 8px; color: #2c3e50;">📸 Foto do Documento (Opcional):</label>
+            <input type="file" id="fotoDocumento" accept="image/*" onchange="processarImagemDocumento(event)" style="background: none; border: none; padding: 0; margin-bottom: 0;">
+            
+            <!-- Aqui a foto aparece depois que você escolhe o arquivo -->
+            <div id="previewDocumento" style="margin-top: 10px; display: none;">
+                <img id="imgPreview" src="" style="max-width: 100%; max-height: 150px; border-radius: 5px; border: 1px solid #ccc; display: block;">
+                <button onclick="removerFotoDocumento()" style="background-color: #e74c3c; padding: 5px 10px; margin-top: 5px; font-size: 12px;">🗑️ Remover Foto</button>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button id="btnSalvarCliente" onclick="cadastrarCliente()" style="flex: 1; background-color: #3498db;">👤 Salvar Cliente</button>
+            <button id="btnCancelarEdicao" onclick="cancelarEdicaoCliente()" style="flex: 1; background-color: #7f8c8d; display: none;">❌ Cancelar Edição</button>
+        </div>
+    </div>
+
+    <div id="painelCliente">
+        <h2>2. Resumo e Histórico do Cliente</h2>
+        <select id="filtroCliente" onchange="atualizarPainelCliente()">
+            <option value="">Selecione um cliente para ver o resumo</option>
+        </select>
+        
+        <div id="resumoFinanceiro" style="margin-top: 15px; font-size: 1.1em; background-color: #f4f4f4; padding: 10px; border-radius: 5px;">
+            <!-- Resumo injetado pelo JavaScript -->
+        </div>
+
+        <h3 style="margin-top: 20px;">Histórico de Compras:</h3>
+        <ul id="historicoCliente"></ul>
+    </div>
+
+    <div id="listaTodosClientes">
+        <h2>3. Lista de Todos os Clientes</h2>
+        <ul id="listaDeClientes"></ul>
+    </div>
+
+    <!-- Rodapé RB Softwares -->
+    <footer class="rodape-desenvolvedor">
+        <p><strong>Desenvolvido e Criado por João Paulo Ribeiro - RB Softwares Comerciais</strong></p>
+        <p>Rua Werner Duwe, 2675, Testo Salto, Blumenau/SC Cep.: 89074-000 | Fone: (47) 98926-0334</p>
+        <p>Since 2025.</p>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

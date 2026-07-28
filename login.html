@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - RB Softwares Comerciais</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-bg">
+
+    <div class="login-container">
+        
+        <!-- LOGO RB SOFTWARES (SVG) -->
+        <div style="margin-bottom: 20px; display: flex; justify-content: center;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 80" width="100%" style="max-width: 280px;">
+                <defs>
+                    <linearGradient id="rbGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#3498db; stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#2c3e50; stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <rect x="10" y="15" width="50" height="50" rx="12" fill="url(#rbGrad)" />
+                <path d="M 25 25 L 25 55 M 25 25 C 40 25 40 40 25 40 C 40 40 40 55 25 55 M 25 40 L 35 55" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                <text x="75" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="800" fill="#2c3e50">RB Softwares</text>
+                <text x="77" y="60" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#7f8c8d" letter-spacing="4">COMERCIAIS</text>
+            </svg>
+        </div>
+
+        <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 0.9em; font-weight: bold; text-transform: uppercase;">Acesso ao Sistema</p>
+
+        <!-- Campos de Login com Design Moderno -->
+        <input type="text" id="usuario" class="login-input" placeholder="👤 Usuário" onkeypress="verificarEnter(event)">
+        
+        <input type="password" id="senha" class="login-input" placeholder="🔒 Senha" onkeypress="verificarEnter(event)">
+
+        <button onclick="fazerLogin()" class="login-btn">Entrar no Sistema</button>
+        
+        <p id="mensagemErro" style="color: #e74c3c; margin-top: 15px; display: none; font-weight: bold;">Usuário ou senha incorretos!</p>
+    </div>
+
+    <!-- Rodapé RB Softwares Minimalista para Login -->
+    <footer style="position: absolute; bottom: 20px; width: 100%; text-align: center; color: #7f8c8d; font-size: 0.8rem; border: none;">
+        <p style="margin: 0;">Desenvolvido por <strong>João Paulo Ribeiro</strong> - RB Softwares Comerciais - Rua Werner Duwe, 2675, Blumenau-SC Fone (47) 98926-0334</p>
+    </footer>
+
+    <script>
+        function fazerLogin() {
+            const usu = document.getElementById('usuario').value;
+            const sen = document.getElementById('senha').value;
+            const erro = document.getElementById('mensagemErro');
+
+            if (usu === 'admin' && sen === 'Gejp@2503') {
+                sessionStorage.setItem('logado', 'true'); 
+                sessionStorage.setItem('perfil', 'admin'); 
+                window.location.href = 'index.html'; 
+            } 
+            else if (usu === 'caixa' && sen === '0000') {
+                sessionStorage.setItem('logado', 'true'); 
+                sessionStorage.setItem('perfil', 'funcionario'); 
+                window.location.href = 'index.html'; 
+            } 
+            else {
+                erro.style.display = 'block'; 
+            }
+        }
+
+        function verificarEnter(event) {
+            if (event.key === 'Enter') fazerLogin();
+        }
+    </script>
+</body>
+</html>

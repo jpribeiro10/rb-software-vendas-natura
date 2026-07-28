@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estoque - Sistema de Vendas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- LOGO NO TOPO DO SISTEMA -->
+    <div style="margin-top: 20px; margin-bottom: -10px;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 80" width="200">
+            <defs>
+                <linearGradient id="rbGradTopo" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#3498db; stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#2c3e50; stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            <rect x="10" y="15" width="50" height="50" rx="12" fill="url(#rbGradTopo)" />
+            <path d="M 25 25 L 25 55 M 25 25 C 40 25 40 40 25 40 C 40 40 40 55 25 55 M 25 40 L 35 55" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="75" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="800" fill="#2c3e50">RB Softwares</text>
+            <text x="77" y="60" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#7f8c8d" letter-spacing="4">COMERCIAIS</text>
+        </svg>
+    </div>
+    <!-- Menu de Navegação Global -->
+    <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+        <button onclick="window.location.href='index.html'">🛒 Frente de Caixa</button>
+        <!-- Adicionamos IDs nestes dois botões -->
+        <button id="menuEstoque" onclick="window.location.href='estoque.html'">📦 Estoque</button>
+        <button id="menuClientes" onclick="window.location.href='clientes.html'">👤 Clientes</button>
+        <button id="menuFinanceiro" onclick="window.location.href='financeiro.html'">💰 Financeiro</button>
+        
+        <button onclick="fazerLogout()" style="background-color: #e74c3c; margin-left: auto;">🚪 Sair</button>
+    </div>
+
+    <h1>Gerenciar Estoque</h1>
+
+    <div id="painel">
+        <h2>1. Cadastrar Novo Produto</h2>
+        
+        <!-- CÓDIGO DE BARRAS PRIMEIRO -->
+        <input type="text" id="codigoBarrasProduto" placeholder="|||||| Código de Barras (Bipe aqui primeiro...)" onkeypress="buscarDadosDoProdutoPorCodigo(event)" style="border-left: 4px solid #3498db; font-weight: bold; font-size: 1.1em; background-color: #e8f8f5;">
+        
+        <input type="text" id="nomeProduto" placeholder="Descrição do Produto (Ex: Camiseta Preta)">
+        
+        <input type="text" id="tipoProduto" placeholder="Categoria (Ex: Vestuário, Alimentos)">
+        
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <input type="number" id="custoProduto" placeholder="Preço de Custo (R$)" style="flex: 1;">
+            <input type="number" id="precoProduto" placeholder="Preço de Revenda (R$)" style="flex: 1;">
+        </div>
+
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div style="flex: 1;">
+                <label style="font-size: 0.9em; font-weight: bold;">Validade (Opcional):</label>
+                <input type="date" id="validadeProduto">
+            </div>
+            <div style="flex: 1;">
+                <label style="font-size: 0.9em; font-weight: bold; color: transparent;">Qtd:</label>
+                <input type="number" id="qtdProduto" placeholder="Quantidade Inicial">
+            </div>
+        </div>
+        
+        <button onclick="cadastrarProduto()">💾 Salvar Produto</button>
+    </div>
+
+    <div id="estoque">
+        <h2>2. Produtos em Estoque</h2>
+        
+        <!-- PAINEL DE VALOR DO ESTOQUE -->
+        <div id="resumoValorEstoque" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
+            <div style="background: #fff3cd; padding: 20px; border-radius: 8px; flex: 1; min-width: 200px; border-left: 5px solid #f1c40f;">
+                <strong style="color: #2c3e50;">Capital Investido (Custo):</strong><br> 
+                <span id="totalCustoEstoque" style="font-size: 1.5rem; font-weight: bold; color: #f39c12;">R$ 0.00</span>
+            </div>
+            <div style="background: #e9f7ef; padding: 20px; border-radius: 8px; flex: 1; min-width: 200px; border-left: 5px solid #27ae60;">
+                <strong style="color: #2c3e50;">Potencial de Venda (Bruto):</strong><br> 
+                <span id="totalVendaEstoque" style="font-size: 1.5rem; font-weight: bold; color: #27ae60;">R$ 0.00</span>
+            </div>
+            <div style="background: #e8f4f8; padding: 20px; border-radius: 8px; flex: 1; min-width: 200px; border-left: 5px solid #2980b9;">
+                <strong style="color: #2c3e50;">Lucro Projetado (Estimativa):</strong><br> 
+                <span id="lucroProjetadoEstoque" style="font-size: 1.5rem; font-weight: bold; color: #2980b9;">R$ 0.00</span>
+            </div>
+        </div>
+
+        <!-- FILTRO DE CATEGORIA -->
+        <div style="margin: 20px 0 15px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <label style="font-weight: 600; color: #2c3e50;">Filtrar por Categoria:</label>
+            <select id="filtroCategoriaEstoque" onchange="atualizarTelaEstoque()" style="flex: 1; max-width: 300px; margin-bottom: 0;">
+                <option value="">Todas as Categorias</option>
+            </select>
+        </div>
+
+        <ul id="listaEstoque"></ul>
+    </div>
+
+    <hr>
+
+    <div id="movimentacoes">
+        <h2>3. Histórico de Movimentações (Auditoria)</h2>
+        <ul id="listaMovimentacoes"></ul>
+    </div>
+
+    <!-- Rodapé RB Softwares -->
+    <footer class="rodape-desenvolvedor">
+        <p><strong>Desenvolvido e Criado por João Paulo Ribeiro - RB Softwares Comerciais</strong></p>
+        <p>Rua Werner Duwe, 2675, Testo Salto, Blumenau/SC Cep.: 89074-000 | Fone: (47) 98926-0334</p>
+        <p>Since 2025.</p>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

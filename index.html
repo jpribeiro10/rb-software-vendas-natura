@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caixa (PDV) - Sistema de Vendas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- LOGO NO TOPO DO SISTEMA -->
+    <div style="margin-top: 20px; margin-bottom: -10px;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 80" width="200">
+            <defs>
+                <linearGradient id="rbGradTopo" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#3498db; stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#2c3e50; stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            <rect x="10" y="15" width="50" height="50" rx="12" fill="url(#rbGradTopo)" />
+            <path d="M 25 25 L 25 55 M 25 25 C 40 25 40 40 25 40 C 40 40 40 55 25 55 M 25 40 L 35 55" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="75" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="800" fill="#2c3e50">RB Softwares</text>
+            <text x="77" y="60" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#7f8c8d" letter-spacing="4">COMERCIAIS</text>
+        </svg>
+    </div>
+    <!-- Menu de Navegação Global -->
+    <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+        <button onclick="window.location.href='index.html'">🛒 Frente de Caixa</button>
+        <!-- Adicionamos IDs nestes dois botões -->
+        <button id="menuEstoque" onclick="window.location.href='estoque.html'">📦 Estoque</button>
+        <button id="menuClientes" onclick="window.location.href='clientes.html'">👤 Clientes</button>
+        <button id="menuFinanceiro" onclick="window.location.href='financeiro.html'">💰 Financeiro</button>
+        
+        <button onclick="fazerLogout()" style="background-color: #e74c3c; margin-left: auto;">🚪 Sair</button>
+    </div>
+
+    <h1>Frente de Caixa (PDV)</h1>
+    
+    <div id="pdv">
+        <h2>Carrinho de Vendas</h2>
+        
+        <!-- 1. ADICIONAR ITENS AO CARRINHO -->
+        <div style="background-color: #f4f4f4; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+            
+            <!-- NOVO CAMPO: LEITOR DE CÓDIGO DE BARRAS -->
+            <input type="text" id="leitorCodigoBarras" placeholder="|||| Passe o leitor de Código de Barras aqui..." onkeypress="buscarPorCodigoBarras(event)" style="margin-bottom: 15px; background-color: #e8f8f5; border: 2px solid #1abc9c; font-weight: bold; text-align: center; font-size: 1.1em;">
+            
+            <div style="text-align: center; margin-bottom: 10px; color: #7f8c8d; font-size: 0.9em;">--- OU BUSQUE PELO NOME ---</div>
+
+            <!-- CAMPO DE BUSCA AO VIVO -->
+            <input type="text" id="buscaProduto" placeholder="🔍 Pesquisar produto por nome..." oninput="atualizarDropdownVendas()" style="margin-bottom: 10px;">
+            
+            <select id="produtoVenda" onchange="preencherPrecoVenda()">
+                <option value="">Selecione um produto</option>
+            </select>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+                <input type="number" id="qtdVenda" placeholder="Qtd" style="flex: 1; margin-bottom: 0;">
+                <input type="number" id="descontoVenda" placeholder="Desconto % (Máx 20)" oninput="aplicarDescontoProduto()" style="flex: 1; margin-bottom: 0;">
+                <input type="number" id="valorVenda" placeholder="Valor Unitário (R$)" style="flex: 1; margin-bottom: 0;">
+            </div>
+            
+            <button onclick="adicionarAoCarrinho()" style="width: 100%;">➕ Adicionar ao Carrinho</button>
+        </div>
+
+        <!-- 2. VISUALIZAR O CARRINHO -->
+        <h3>🛒 Itens no Carrinho:</h3>
+        <ul id="listaCarrinho"></ul>
+        <h3 id="totalCarrinho" style="color: #2980b9;">Total: R$ 0.00</h3>
+
+        <!-- 3. FINALIZAR A VENDA -->
+        <div style="background-color: #e9f7ef; padding: 15px; border-radius: 5px; margin-top: 15px;">
+            
+            <label style="font-weight: 600; display: block; margin-bottom: 5px;">Vincular a um Cliente:</label>
+            <select id="clienteVenda">
+                <option value="">Cliente Avulso (Sem registro)</option>
+            </select>
+            
+            <label style="font-weight: 600; margin-top: 15px; display: block; margin-bottom: 5px;">Forma de Pagamento:</label>
+            <select id="formaPagamento" onchange="calcularParcelamento()">
+                <option value="1">À vista (Sem juros)</option>
+                <option value="2">2x (com juros de 0,9% a.m.)</option>
+                <option value="3">3x (com juros de 0,9% a.m.)</option>
+                <option value="4">4x (com juros de 0,9% a.m.)</option>
+                <option value="5">5x (com juros de 0,9% a.m.)</option>
+            </select>
+
+            <!-- Painel dinâmico do Parcelamento (fica oculto por padrão) -->
+            <div id="resumoParcelamento" style="margin: 15px 0; padding: 15px; background: #fff; border-radius: 5px; border: 1px dashed #27ae60; display: none;">
+                <!-- O Javascript vai injetar os valores aqui -->
+            </div>
+
+            <label style="font-weight: 600; margin-top: 10px; display: block; margin-bottom: 5px;">Entrada / Valor Pago Agora:</label>
+            <input type="number" id="valorPago" placeholder="R$ 0,00" value="0">
+            
+            <button onclick="finalizarVenda()" style="margin-top: 15px; width: 100%; background-color: #27ae60;">✅ Finalizar Venda</button>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- 4. ÁREA DE SEGURANÇA E BACKUP -->
+    <div id="backup" style="background-color: #fff3cd; padding: 15px; border-radius: 5px; margin-bottom: 30px;">
+        <h2>💾 Backup e Segurança</h2>
+        <p>Gere um arquivo com todos os seus dados e salve (ex: Google Drive) para não perder nada.</p>
+        <button onclick="fazerBackup()">📥 Baixar Backup dos Dados</button>
+        
+        <hr style="margin: 15px 0; border-top: 1px solid #ffe69c;">
+        
+        <h3>🔄 Restaurar Backup</h3>
+        <p style="color: #c0392b; font-size: 0.9em; margin-bottom: 10px;"><strong>Atenção:</strong> Restaurar um backup irá substituir todos os dados atuais deste computador.</p>
+        <input type="file" id="arquivoBackup" accept=".json" style="background-color: #fff;">
+        <button onclick="importarBackup()" style="background-color: #e67e22;">📤 Restaurar Dados</button>
+    </div>
+
+   <!-- Rodapé RB Softwares -->
+    <footer class="rodape-desenvolvedor">
+        <p><strong>Desenvolvido e Criado por João Paulo Ribeiro - RB Softwares Comerciais</strong></p>
+        <p>Rua Werner Duwe, 2675, Testo Salto, Blumenau/SC Cep.: 89074-000 | Fone: (47) 98926-0334</p>
+        <p>Since 2025.</p>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
